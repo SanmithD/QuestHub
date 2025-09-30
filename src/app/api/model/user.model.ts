@@ -1,7 +1,6 @@
 import mongoose, { Document } from "mongoose";
 
 export interface UserDoc extends Document{
-    userId? : string;
     username: string;
     email: string;
     password?: string;

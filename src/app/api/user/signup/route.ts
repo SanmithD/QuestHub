@@ -20,7 +20,7 @@ export const POST = async(req: NextRequest) =>{
             password: hashPass
         });
         await newUser.save();
-        const token = generateToken(newUser._id.toString());
+        const token = generateToken({ userId: newUser._id.toString()});
         
         const res = NextResponse.json({ message: "User created" },{ status: 201 });
         res.cookies.set("jwt", token,{

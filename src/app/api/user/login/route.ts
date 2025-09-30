@@ -17,7 +17,7 @@ export const POST = async(req: NextRequest) =>{
         if(!hashPass){
             return NextResponse.json({ message: "Invalid credentials" },{ status: 403 });
         }
-        const token = generateToken(user._id.toString());
+        const token = generateToken({ userId: user._id.toString()});
         
         const res = NextResponse.json({ message: "User loggedIn" },{ status: 201 });
         res.cookies.set("jwt", token,{

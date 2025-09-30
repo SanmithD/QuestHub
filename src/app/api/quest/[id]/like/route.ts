@@ -9,7 +9,8 @@ export const PATCH = async (
   context: { params: { questId: string } }
 ) => {
   const userId = await authorization(_req);
-  const { questId } = context.params;
+  const questId = context.params;
+  console.log("quest id", questId)
 
   if (!userId)
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -17,7 +18,7 @@ export const PATCH = async (
   try {
     await connectDB();
 
-    const quest = await questModel.findById(questId);
+    const quest = await questModel.findById({ _id: questId});
     if (!quest) return NextResponse.json({ message: "Quest not found" }, { status: 404 });
 
     let liked = false;

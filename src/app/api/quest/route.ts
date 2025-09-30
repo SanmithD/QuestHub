@@ -8,14 +8,14 @@ export const POST = async(req: NextRequest) =>{
     const userId = await authorization(req);
     if(!userId) return NextResponse.json({ message: "Unauthorized" },{ status: 401 });
 
-    if (!body.message)
+    if (!body.data)
     return NextResponse.json({ message: "Message is required" }, { status: 400 });
 
     try {
         await connectDB();
         const newQuest = new questModel({
             userId,
-            message: body.message,
+            message: body.data,
         });
         if(!newQuest) return NextResponse.json({ message: "Invalid request" },{ status: 400 });
         await newQuest.save();

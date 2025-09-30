@@ -1,26 +1,30 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
-import { userModel } from '../model/user.model';
+import { userModel } from "../model/user.model";
 
-export const authorization = async(req: NextRequest) =>{
-    const token = req.cookies.get("jwt")?.value;
-    if(!token){
-        throw new Error("Invalid token")
+export const authorization = async (req: NextRequest): Promise<string> => {
+  const token = req.cookies.get("jwt")?.value;
+  if (!token) {
+    throw new Error("Invalid token");
+  }
+
+  if (!process.env.JWT_SECRET) {
+    throw new Error("Invalid secret");
+  }
+
+  try {
+    const decode = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
+
+    console.log("decoded", decode);
+    const user = await userModel.findById(decode.userId).select("-password");
+
+    if (!user) {
+      throw new Error("User not found");
     }
-    try {
-        if(!process.env.JWT_SECRET) {
-            throw new Error("Invalid secret");
-        }
-        const decode = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
-        const user = await userModel.findById(decode.userId).select("-password");
 
-        if(!user) {
-            throw new Error("user not found");
-        }
-
-        return { user }
-    } catch (error) {
-        console.log(error);
-        throw new Error("Middleware Error")
-    }
-}
+    return user._id.toString();
+  } catch (error) {
+    console.log(error);
+    throw new Error("Authorization failed");
+  }
+};

@@ -26,7 +26,7 @@ function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await signup(formData);
-    if(status){
+    if(status === true){
       router.push('/')
     }
   };
