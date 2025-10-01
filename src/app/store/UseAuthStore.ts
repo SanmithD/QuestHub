@@ -7,8 +7,8 @@ type UserDetails ={
     username?: string;
     email: string;
     password?: string;
-    createdAt?: string;
-    updatedAt?: string
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 interface AuthDetails{
@@ -60,7 +60,18 @@ export const UseAuthStore = create<AuthDetails>((set) =>({
 
     },
     profile: async() =>{
-
+        set({ isLoading: true });
+        try {
+            const res = await axios.get(`/api/user/profile`,{ withCredentials: true });
+            console.log(res.data);
+            set({ auth: res.data?.res, isLoading: false });
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
+            console.log(error);
+            toast.error(error.response?.data.message || "Something went wrong");
+        }finally{
+            set({ isLoading: false });
+        }
     },
     getProfile: async(id) =>{
 

@@ -3,10 +3,10 @@ import { connectDB } from "../../lib/dbConnection";
 import { authorization } from "../../middlewares/auth.middleware";
 import { questModel } from "../../model/quest.model";
 
-export const PUT = async(_req: NextRequest, context: { params: Promise<{ questId: string }> }) =>{
+export const PUT = async(_req: NextRequest, context: { params: Promise<{ id: string }> }) =>{
     const body = await _req.json();
     const userId = await authorization(_req);
-    const questId = context.params;
+    const { id: questId } = await context.params;
     if(!userId) return NextResponse.json({ message: "Unauthorized" },{ status: 401 });
     if (!body.message) return NextResponse.json({ message: "Message is required" }, { status: 400 });
 
@@ -21,9 +21,9 @@ export const PUT = async(_req: NextRequest, context: { params: Promise<{ questId
     }
 }
 
-export const DELETE = async(_req: NextRequest, context: { params: Promise<{ questId: string }> }) =>{
+export const DELETE = async(_req: NextRequest, context: { params: Promise<{ id: string }> }) =>{
     const userId = await authorization(_req);
-    const questId = context.params;
+    const { id: questId } = await context.params;
     if(!userId) return NextResponse.json({ message: "Unauthorized" },{ status: 401 });
 
     try {
@@ -37,9 +37,9 @@ export const DELETE = async(_req: NextRequest, context: { params: Promise<{ ques
     }
 }
 
-export const GET = async(_req: NextRequest, context: { params: Promise<{ questId: string }> }) =>{
+export const GET = async(_req: NextRequest, context: { params: Promise<{ id: string }> }) =>{
     const userId = await authorization(_req);
-    const questId = context.params;
+    const { id: questId } = await context.params;
     if(!userId) return NextResponse.json({ message: "Unauthorized" },{ status: 401 });
 
     try {

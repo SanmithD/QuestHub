@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
+import { connectDB } from "../lib/dbConnection";
 import { userModel } from "../model/user.model";
 
 export const authorization = async (req: NextRequest): Promise<string> => {
@@ -13,9 +14,8 @@ export const authorization = async (req: NextRequest): Promise<string> => {
   }
 
   try {
+    await connectDB();
     const decode = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
-
-    console.log("decoded", decode);
     const user = await userModel.findById(decode.userId).select("-password");
 
     if (!user) {

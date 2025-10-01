@@ -11,7 +11,7 @@ export const GET = async(req: NextRequest) =>{
         const res = await userModel.findById(userId).select("-password");
         if(!res) return NextResponse.json({ message: "Account not found" },{ status: 404 });
 
-        return NextResponse.json({ message: "Profile", res },{ status: 403 });
+        return NextResponse.json({ message: "Profile", res },{ status: 200 });
     } catch (error) {
         console.log(error);
         return NextResponse.json({ message: "Server error" },{ status: 500 });

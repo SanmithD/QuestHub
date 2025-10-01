@@ -2,7 +2,8 @@ import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-type QuestDetails = {
+export type QuestDetails = {
+    _id?: string;
     questId?: string;
     message: string;
     userId?: string;

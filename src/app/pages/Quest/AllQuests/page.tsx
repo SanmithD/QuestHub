@@ -1,7 +1,7 @@
 "use client";
 
 import QuestCard from "@/app/Components/QuestCard";
-import { UseQuestStore } from "@/app/store/UseQuestStore";
+import { QuestDetails, UseQuestStore } from "@/app/store/UseQuestStore";
 import { useEffect, useState } from "react";
 
 function AllQuest() {
@@ -21,7 +21,7 @@ function AllQuest() {
   return (
     <div className="max-w-2xl mx-auto mt-6 space-y-4">
       {quests && quests.length > 0 ? (
-        quests.map((quest) => <QuestCard key={quest.questId} quest={quest} />)
+        quests.map((quest) => <QuestCard key={quest.questId} quest={quest as QuestDetails} />)
       ) : (
         <p className="text-center text-gray-500">No quests found</p>
       )}

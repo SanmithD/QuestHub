@@ -1,6 +1,7 @@
  import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import Navbar from "./Components/Navbar";
 import SessionWrapper from "./Components/SessionWrapper";
 import './globals.css';
 
@@ -31,6 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster/>
+        <Navbar/>
         {children}
       </body>
       </SessionWrapper>

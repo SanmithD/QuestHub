@@ -5,10 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const PATCH = async (
   _req: NextRequest,
-  context: { params: { questId: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   const userId = await authorization(_req);
-  const { questId } = context.params;
+  const { id: questId } = await context.params;
   const body = await _req.json(); 
   if (!userId)
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
