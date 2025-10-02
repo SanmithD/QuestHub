@@ -22,7 +22,7 @@ export const UseBookmarkStore = create<BookMark>((set) => ({
       set((state) => ({
         booked: {
           ...state.booked,
-          [questId]: res?.status === 201, // true if added, false if removed
+          [questId]: res?.status === 201,
         },
       }));
     } catch (error) {

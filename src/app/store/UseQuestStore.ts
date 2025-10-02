@@ -2,42 +2,61 @@ import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
+export type UserDetails = {
+    username: string;
+    userId: string
+}
+
 export type QuestDetails = {
-    _id?: string;
+    _id: string;
     questId?: string;
     message: string;
-    userId?: string;
+    userId?: UserDetails;
     comment?: [];
     createdAt?: Date;
     updatedAt?: Date;
-    likes?: string;
+    likes?: string[]; // Changed to string array for better type safety
     rankValue?: string;
 }
 
-interface Quest{
+interface Quest {
     isLoading: boolean;
     quests: QuestDetails[] | null;
 
     postQuest: (data: string) => Promise<void>;
-    getAllQuests: (page: string, limit: string) =>Promise<void>;
+    getAllQuests: (page: number, limit: number) => Promise<void>;
     getQuestById: (questId: string) => Promise<void>;
     deleteQuest: (questId: string) => Promise<void>;
     updateQuest: (questId: string) => Promise<void>;
     postComment: (questId: string, data: string) => Promise<void>;
     postLike: (questId: string) => Promise<void>;
     postRank: (questId: string) => Promise<void>;
+    
+    // New optimistic update methods
+    updateQuestOptimistically: (questId: string, updates: Partial<QuestDetails>) => void;
 }
 
-export const UseQuestStore = create<Quest>((set, get) =>({
+export const UseQuestStore = create<Quest>((set, get) => ({
     isLoading: false,
     quests: null,
 
-    postQuest: async(data) =>{
+    // Optimistic update helper
+    updateQuestOptimistically: (questId, updates) => {
+        const currentQuests = get().quests;
+        if (!currentQuests) return;
+        
+        const updatedQuests = currentQuests.map(quest =>
+            quest._id === questId ? { ...quest, ...updates } : quest
+        );
+        set({ quests: updatedQuests });
+    },
+
+    postQuest: async (data) => {
         set({ isLoading: true });
         try {
-            await axios.post(`/api/quest`,{data},{ withCredentials: true });
+            await axios.post(`/api/quest`, { data }, { withCredentials: true });
             set({ isLoading: false });
-            await get().getAllQuests("1","10");
+            await get().getAllQuests(1, 10);
         } catch (err) {
             const error = err as AxiosError<{ message: string }>
             console.log(error);
@@ -46,10 +65,10 @@ export const UseQuestStore = create<Quest>((set, get) =>({
         }
     },
 
-    getAllQuests: async(page, limit) =>{
+    getAllQuests: async (page, limit) => {
         set({ isLoading: true });
         try {
-            const res = await axios.get(`/api/quest?page=${page}&limit=${limit}`,{ withCredentials: true });
+            const res = await axios.get(`/api/quest?page=${page}&limit=${limit}`, { withCredentials: true });
             console.log(res.data?.res);
             set({ isLoading: false, quests: res.data?.res });
         } catch (err) {
@@ -60,10 +79,10 @@ export const UseQuestStore = create<Quest>((set, get) =>({
         }
     },
 
-    getQuestById: async(questId) =>{
+    getQuestById: async (questId) => {
         set({ isLoading: true });
         try {
-            const res = await axios.get(`/api/quest/${questId}`,{ withCredentials: true });
+            const res = await axios.get(`/api/quest/${questId}`, { withCredentials: true });
             console.log(res.data);
             set({ isLoading: false });
         } catch (err) {
@@ -74,10 +93,10 @@ export const UseQuestStore = create<Quest>((set, get) =>({
         }
     },
 
-    deleteQuest: async(questId) =>{
+    deleteQuest: async (questId) => {
         set({ isLoading: true });
         try {
-            const res = await axios.delete(`/api/quest/${questId}`,{ withCredentials: true });
+            const res = await axios.delete(`/api/quest/${questId}`, { withCredentials: true });
             console.log(res.data);
             set({ isLoading: false });
         } catch (err) {
@@ -88,10 +107,10 @@ export const UseQuestStore = create<Quest>((set, get) =>({
         }
     },
 
-    updateQuest: async(questId) =>{
+    updateQuest: async (questId) => {
         set({ isLoading: true });
         try {
-            const res = await axios.put(`/api/quest/${questId}`,{ withCredentials: true });
+            const res = await axios.put(`/api/quest/${questId}`, { withCredentials: true });
             console.log(res.data);
             set({ isLoading: false });
         } catch (err) {
@@ -102,12 +121,13 @@ export const UseQuestStore = create<Quest>((set, get) =>({
         }
     },
 
-    postComment: async(questId, data) =>{
+    postComment: async (questId, data) => {
         set({ isLoading: true });
         try {
-            const res = await axios.post(`/api/quest/${questId}/comment`,{data},{ withCredentials: true });
+            const res = await axios.post(`/api/quest/${questId}/comment`, { data }, { withCredentials: true });
             console.log(res.data);
             set({ isLoading: false });
+            await get().getQuestById(questId);
         } catch (err) {
             const error = err as AxiosError<{ message: string }>
             console.log(error);
@@ -116,24 +136,55 @@ export const UseQuestStore = create<Quest>((set, get) =>({
         }
     },
 
-    postLike: async(questId) =>{
-        set({ isLoading: true });
+    postLike: async (questId) => {
+        const currentQuests = get().quests;
+        if (!currentQuests) return;
+
+        // Find current quest
+        const currentQuest = currentQuests.find(q => q._id === questId);
+        if (!currentQuest) return;
+
+        // Get current user ID (you'll need to implement this)
+        // For now, I'll assume you have a way to get current user ID
+        const getCurrentUserId = () => {
+            // Implement this method to get current user ID from auth store or context
+            // This is a placeholder - replace with your actual user ID retrieval
+            return "current_user_id"; 
+        };
+
+        const currentUserId = getCurrentUserId();
+        const currentLikes = currentQuest.likes || [];
+        const isLiked = currentLikes.includes(currentUserId);
+        
+        // Optimistic update
+        const optimisticLikes = isLiked 
+            ? currentLikes.filter(id => id !== currentUserId)
+            : [...currentLikes, currentUserId];
+        
+        get().updateQuestOptimistically(questId, { likes: optimisticLikes });
+
         try {
-            const res = await axios.patch(`/api/quest/${questId}/like`,{ withCredentials: true });
+            const res = await axios.patch(`/api/quest/${questId}/like`, {}, { withCredentials: true });
             console.log(res.data);
-            set({ isLoading: false });
+            
+            // Update with server response if needed
+            if (res.data?.quest?.likes) {
+                get().updateQuestOptimistically(questId, { likes: res.data.quest.likes });
+            }
         } catch (err) {
+            // Revert optimistic update on error
+            get().updateQuestOptimistically(questId, { likes: currentLikes });
+            
             const error = err as AxiosError<{ message: string }>
             console.log(error);
-            set({ isLoading: false });
             toast.error(error.response?.data?.message || "Something went wrong");
         }
     },
 
-    postRank: async(questId) =>{
+    postRank: async (questId) => {
         set({ isLoading: true });
         try {
-            const res = await axios.patch(`/api/quest/${questId}/rank`,{ withCredentials: true });
+            const res = await axios.patch(`/api/quest/${questId}/rank`, {}, { withCredentials: true });
             console.log(res.data);
             set({ isLoading: false });
         } catch (err) {

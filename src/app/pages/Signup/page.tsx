@@ -1,5 +1,6 @@
 "use client";
 
+import Login from "@/app/Components/loginBtn";
 import { UseAuthStore } from "@/app/store/UseAuthStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -89,6 +90,8 @@ function SignupPage() {
             {isLoading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
+
+        <Login/>
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{" "}

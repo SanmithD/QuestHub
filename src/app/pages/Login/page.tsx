@@ -1,5 +1,6 @@
 "use client";
 
+import Login from "@/app/Components/loginBtn";
 import { UseAuthStore } from "@/app/store/UseAuthStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -74,6 +75,7 @@ function LoginPage() {
           </button>
         </form>
 
+        <Login/>
         <p className="mt-6 text-center text-sm text-gray-600">
           Don&apos;t have an account?{" "}
           <a href="/pages/Signup" className="text-blue-600 hover:underline">

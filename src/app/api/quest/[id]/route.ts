@@ -44,9 +44,9 @@ export const GET = async(_req: NextRequest, context: { params: Promise<{ id: str
 
     try {
         await connectDB();
-        const updateQuest = await questModel.findById(questId).populate("userId");
-        if(!updateQuest) return NextResponse.json({ message: "Invalid request" },{ status: 400 });
-        return NextResponse.json({ message: "Quest" },{ status: 200 });
+        const quest = await questModel.findById(questId).populate("userId");
+        if(!quest) return NextResponse.json({ message: "Invalid request" },{ status: 400 });
+        return NextResponse.json({ message: "Quest", quest },{ status: 200 });
     } catch (error) {
         console.log(error);
         return NextResponse.json({ message: "Server Error" },{ status: 500 });

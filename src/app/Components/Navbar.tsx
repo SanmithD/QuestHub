@@ -1,12 +1,21 @@
 "use client";
 
-import { Bookmark, Menu, SearchIcon, Trophy, User2, X } from "lucide-react";
+import { Bookmark, Menu, Moon, SearchIcon, Sun, Trophy, User2, X } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { UseThemeStore } from "../store/UseThemeStore";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false); // ✅ track client mount
+
+  const theme = UseThemeStore((state) => state.theme);
+  const setTheme = UseThemeStore((state) => state.setTheme);
+
+  useEffect(() => {
+    setMounted(true); // ✅ ensures theme toggle renders only on client
+  }, []);
 
   const navItems = [
     { name: "Search", icon: <SearchIcon />, href: "/search" },
@@ -14,6 +23,8 @@ function Navbar() {
     { name: "Bookmark", icon: <Bookmark />, href: "/bookmark" },
     { name: "Profile", icon: <User2 />, href: "/pages/User" },
   ];
+
+  if (!mounted) return null; // ✅ prevents hydration mismatch
 
   return (
     <div className="mx-auto flex justify-between items-center px-4 md:px-12 py-3 border-b ">
@@ -30,6 +41,14 @@ function Navbar() {
             {item.name}
           </Link>
         ))}
+
+        <button
+          className="cursor-pointer hover:text-sky-700"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? <Sun size={24} /> : <Moon size={24} />}
+        </button>
+
         <button
           onClick={() => signOut()}
           className="px-4 rounded-md bg-red-400 py-2 text-white cursor-pointer hover:bg-red-500 active:bg-red-700"
@@ -57,6 +76,7 @@ function Navbar() {
               {item.name}
             </Link>
           ))}
+
           <button
             onClick={() => {
               setIsOpen(false);

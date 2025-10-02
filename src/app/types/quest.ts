@@ -7,13 +7,13 @@ export interface QuestComment {
 export interface Quest {
   _id: string;
   userId: {
-    _id: string;
+    userId: string;
     username: string;
   };
   message: string;
-  likes: string[];
-  comments: QuestComment[];
-  rankValue: number;
-  createdAt: string;
-  updatedAt: string;
+  likes?: string[];
+  comments?: QuestComment[];
+  rankValue?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
