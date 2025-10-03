@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
+import { QuestComment } from "../types/quest";
 
 export type UserDetails = {
     username: string;
@@ -12,16 +13,18 @@ export type QuestDetails = {
     questId?: string;
     message: string;
     userId?: UserDetails;
-    comment?: [];
+    comment?: QuestComment[];
     createdAt?: Date;
     updatedAt?: Date;
-    likes?: string[]; // Changed to string array for better type safety
+    likes?: string[];
     rankValue?: string;
 }
 
 interface Quest {
     isLoading: boolean;
+    isCommentLoading: boolean;
     quests: QuestDetails[] | null;
+    comments?: QuestComment[] | null;
 
     postQuest: (data: string) => Promise<void>;
     getAllQuests: (page: number, limit: number) => Promise<void>;
@@ -30,6 +33,7 @@ interface Quest {
     updateQuest: (questId: string) => Promise<void>;
     postComment: (questId: string, data: string) => Promise<void>;
     postLike: (questId: string) => Promise<void>;
+    fetchComments: (questId: string, limit: number) => Promise<void>;
     postRank: (questId: string) => Promise<void>;
     
     // New optimistic update methods
@@ -39,8 +43,9 @@ interface Quest {
 export const UseQuestStore = create<Quest>((set, get) => ({
     isLoading: false,
     quests: null,
+    comments: null,
+    isCommentLoading: false,
 
-    // Optimistic update helper
     updateQuestOptimistically: (questId, updates) => {
         const currentQuests = get().quests;
         if (!currentQuests) return;
@@ -84,7 +89,7 @@ export const UseQuestStore = create<Quest>((set, get) => ({
         try {
             const res = await axios.get(`/api/quest/${questId}`, { withCredentials: true });
             console.log(res.data);
-            set({ isLoading: false });
+            set({ isLoading: false, quests: res.data?.quest });
         } catch (err) {
             const error = err as AxiosError<{ message: string }>
             console.log(error);
@@ -121,17 +126,31 @@ export const UseQuestStore = create<Quest>((set, get) => ({
         }
     },
 
-    postComment: async (questId, data) => {
+    postComment: async (questId, comment) => {
         set({ isLoading: true });
         try {
-            const res = await axios.post(`/api/quest/${questId}/comment`, { data }, { withCredentials: true });
+            const res = await axios.patch(`/api/quest/${questId}/comment`, { comment }, { withCredentials: true });
             console.log(res.data);
             set({ isLoading: false });
-            await get().getQuestById(questId);
+            await get().fetchComments(questId, 10);
         } catch (err) {
             const error = err as AxiosError<{ message: string }>
             console.log(error);
             set({ isLoading: false });
+            toast.error(error.response?.data?.message || "Something went wrong");
+        }
+    },
+
+    fetchComments: async(questId, limit) =>{
+        set({ isCommentLoading: true });
+        try {
+            const res = await axios.get(`/api/quest/${questId}/comment?limit=${limit}`,{ withCredentials: true });
+            console.log(res.data);
+            set({ isCommentLoading: false, comments: res.data?.comments });
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>
+            console.log(error);
+            set({ isCommentLoading: false });
             toast.error(error.response?.data?.message || "Something went wrong");
         }
     },

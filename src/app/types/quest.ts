@@ -1,7 +1,8 @@
 export interface QuestComment {
   userId: string;
-  text: string;
-  createdAt: string;
+  username: string;
+  message: string;
+  createdAt?: Date;
 }
 
 export interface Quest {
