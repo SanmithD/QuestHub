@@ -22,7 +22,7 @@ function Navbar() {
   const navItems = [
     { name: "Search", icon: <SearchIcon />, href: "/search" },
     { name: "Top Rank", icon: <Trophy />, href: "/top-rank" },
-    { name: "Bookmark", icon: <Bookmark />, href: "/bookmark" },
+    { name: "Bookmark", icon: <Bookmark />, href: "/pages/Quest/Book" },
     { name: "Profile", icon: <User2 />, href: "/pages/User" },
   ];
 

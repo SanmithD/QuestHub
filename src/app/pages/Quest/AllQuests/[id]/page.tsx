@@ -1,10 +1,9 @@
 "use client";
 
+import Comments from "@/app/Components/Comments";
 import { UseQuestStore } from "@/app/store/UseQuestStore";
 import { Calendar, Heart, MessageSquare, Trophy, User } from "lucide-react";
-import React, { lazy, Suspense, useEffect, useState } from "react";
-
-const Comments = lazy(() => import("@/app/Components/Comments"))
+import React, { useEffect, useState } from "react";
 
 type QuestInfoProps = {
   params: Promise<{ id: string }>;
@@ -16,7 +15,7 @@ function QuestInfo({ params }: QuestInfoProps) {
   const getQuestById = UseQuestStore((state) => state.getQuestById);
   const postComment = UseQuestStore((state) => state.postComment);
   const isLoading = UseQuestStore((state) => state.isLoading);
-  const quest = UseQuestStore((state) => state.quests);
+  const quest = UseQuestStore((state) => state.currentQuest);
 
   useEffect(() => {
     if (id) {
@@ -37,12 +36,14 @@ function QuestInfo({ params }: QuestInfoProps) {
   }
 
   const handlePostComment = async () => {
+    if (!userComment.trim()) return;
     await postComment(id.toString(), userComment);
+    setUserComment("");
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-lg space-y-6">
-      {quest.userId && (
+    <div className="max-w-3xl mx-auto p-6 rounded-2xl shadow-lg space-y-6">
+      {quest?.userId && (
         <div className="flex items-center gap-3 border-b pb-4">
           <div className="p-2 bg-gray-100 rounded-full">
             <User className="w-6 h-6 text-gray-600" />
@@ -55,13 +56,17 @@ function QuestInfo({ params }: QuestInfoProps) {
       )}
 
       <div>
-        <p className="text-lg text-gray-800 leading-relaxed">{quest.message}</p>
+        <p className="text-lg leading-relaxed">{quest.message}</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-6 text-gray-600 text-sm">
         <div className="flex items-center gap-1">
           <Calendar className="w-4 h-4" />
-          <span>{new Date(quest.createdAt).toLocaleString()}</span>
+          <span>
+            {quest.createdAt
+              ? new Date(quest.createdAt).toLocaleString()
+              : "Unknown date"}
+          </span>
         </div>
         <div className="flex items-center gap-1">
           <Heart className="w-4 h-4 text-red-500" />
@@ -69,7 +74,7 @@ function QuestInfo({ params }: QuestInfoProps) {
         </div>
         <div className="flex items-center gap-1">
           <MessageSquare className="w-4 h-4" />
-          <span>{quest.comments?.length || 0} Comments</span>
+          <span>{quest.comment?.length || 0} Comments</span>
         </div>
         <div className="flex items-center gap-1">
           <Trophy className="w-4 h-4 text-yellow-500" />
@@ -93,6 +98,7 @@ function QuestInfo({ params }: QuestInfoProps) {
             placeholder="Share you'r opinion..."
           />
           <button
+            type="button"
             disabled={isLoading}
             onClick={handlePostComment}
             className="w-fit px-2 py-0.5 bg-sky-500 font-bold text-white tracking-wider cursor-pointer hover:bg-sky-800"
@@ -100,9 +106,7 @@ function QuestInfo({ params }: QuestInfoProps) {
             {isLoading ? "Sending..." : "Share"}{" "}
           </button>
         </div>
-        <Suspense fallback={"Loading..."}>
-          <Comments id={id} />
-        </Suspense>
+        <Comments id={id} />
       </div>
     </div>
   );

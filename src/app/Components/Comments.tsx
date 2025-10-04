@@ -1,21 +1,25 @@
+"use client";
+
 import { User2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { UseQuestStore } from "../store/UseQuestStore";
+import { QuestComment } from "../types/quest";
 
 type CommentsProps = {
   id: string;
 };
 
-function Comments({id}: CommentsProps) {
+function Comments({ id }: CommentsProps) {
+  const [limit, setLimit] = useState(10);
   const isLoading = UseQuestStore((state) => state.isCommentLoading);
   const fetchComments = UseQuestStore((state) => state.fetchComments);
-  const comments = UseQuestStore((state) => state.comments);
+  const comments = UseQuestStore((state) => state.comments) as QuestComment[];
 
   useEffect(() => {
     if (id) {
-      fetchComments(id, 10);
+      fetchComments(id, limit);
     }
-  }, []);
+  }, [id, limit, fetchComments]);
 
   if (isLoading) {
     return <div className="text-gray-500">Loading comments...</div>;
@@ -26,13 +30,15 @@ function Comments({id}: CommentsProps) {
   }
 
   return (
-    <div className="mt-4 space-y-3">
-      {comments.map((c, idx) => (
+    <div className="h-screen overflow-y-scroll mt-4 space-y-3">
+      {comments.map((c) => (
         <div
-          key={idx}
-          className="p-3 border rounded-lg bg-gray-50 text-sm text-gray-700"
+          key={c._id}
+          className="p-3 rounded-lg text-sm "
         >
-          <p className="font-medium flex items-center text-[18px] gap-1"><User2 size={20} /> {c.userId?.username}</p>
+          <p className="font-medium flex items-center text-[18px] gap-1">
+            <User2 size={20} /> {c.userId.username}
+          </p>
           <p>{c.message}</p>
           {c.createdAt && (
             <p className="text-xs text-gray-400 mt-1">
@@ -41,6 +47,13 @@ function Comments({id}: CommentsProps) {
           )}
         </div>
       ))}
+
+      <button
+        className="px-3 py-1 mt-4 bg-sky-500 rounded"
+        onClick={() => setLimit(limit + 10)}
+      >
+        Load more
+      </button>
     </div>
   );
 }

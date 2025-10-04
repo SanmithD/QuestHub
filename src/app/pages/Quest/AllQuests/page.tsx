@@ -32,7 +32,7 @@ function AllQuest() {
         quests.map((quest) => (
           <div
             key={quest._id}
-            className="bg-white shadow rounded-xl p-4 border hover:bg-sky-50 border-gray-200"
+            className="shadow rounded-xl p-4 border hover:bg-gray-400 border-gray-200"
           >
             <div onClick={()=>router.push(`/pages/Quest/AllQuests/${quest._id}`)}  className="cursor-pointer flex flex-col gap-2 mb-2">
               <div>
@@ -43,7 +43,7 @@ function AllQuest() {
                     : "Unknown date"}
                 </p>
               </div>
-            <p className="text-gray-800 mb-3">{quest.message.length > 200 ? quest.message.slice(0,200) + quest.message.substring(0,200) + "..." : quest.message}</p>
+            <p className=" mb-3">{quest.message.length > 200 ? quest.message.slice(0,200) + quest.message.substring(0,200) + "..." : quest.message}</p>
             </div>
 
             <div className="flex items-center gap-2" >
@@ -55,11 +55,7 @@ function AllQuest() {
                 className="p-2 rounded-full cursor-pointer hover:bg-gray-100 transition-colors"
               >
                 <Bookmark
-                  className={`w-5 h-5 ${
-                    booked[quest._id]
-                      ? "text-yellow-500 fill-yellow-500"
-                      : "text-gray-400"
-                  }`}
+                  className={`w-5 h-5 `}
                 />
               </button>
             </div>

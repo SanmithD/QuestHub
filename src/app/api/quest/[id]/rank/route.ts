@@ -31,3 +31,16 @@ export const PATCH = async (
     return NextResponse.json({ message: "Server Error" }, { status: 500 });
   }
 };
+
+export const GET = async() =>{
+  try {
+    const res = await questModel.find({ rankValue: -1 }).populate("userId").sort({ createdAt: -1 });
+
+    if(!res || res.length === 0) return NextResponse.json({ message: "No top ranked quest" },{ status: 404 });
+
+    return NextResponse.json({ message: "Top quests", res },{ status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ message: "Server Error" }, { status: 500 });
+  }
+}

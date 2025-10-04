@@ -1,5 +1,6 @@
 "use client";
 
+import UserQuests from "@/app/Components/UserQuests";
 import { UseAuthStore } from "@/app/store/UseAuthStore";
 import { Calendar, Edit3, Mail, Trash2, User2 } from "lucide-react";
 import { useEffect } from "react";
@@ -27,7 +28,7 @@ function Profile() {
       <h1 className="text-2xl font-bold mb-6">Profile</h1>
 
       {/* Profile Card */}
-      <div className="bg-white shadow-md rounded-2xl p-6 max-w-lg mx-auto">
+      <div className="shadow-md rounded-2xl p-6 max-w-lg mx-auto">
         <div className="flex items-center gap-4 mb-6">
           <div className="bg-sky-100 p-4 rounded-full">
             <User2 className="w-10 h-10 text-sky-600" />
@@ -71,6 +72,9 @@ function Profile() {
 
       <div className="mt-10">
         <NewQuest />
+      </div>
+      <div>
+        <UserQuests/>
       </div>
     </div>
   );

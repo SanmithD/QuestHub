@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
+import { UserQuestType } from "../types/quest";
 
 type UserDetails ={
     userId?: string;
@@ -13,20 +14,25 @@ type UserDetails ={
 
 interface AuthDetails{
     isLoading: boolean;
+    isQuestLoading: boolean;
     auth: UserDetails | null;
     status: boolean;
+    userQuest: UserQuestType[];
     signup: (data: UserDetails) => Promise<void>;
     login: (data: UserDetails) => Promise<void>;
     deleteAccount: () => Promise<void>;
     updateAccount: () => Promise<void>;
     profile: () => Promise<void>;
     getProfile: (userId: string) => Promise<void>;
+    getUserQuest: () =>Promise<void>;
 }
 
 export const UseAuthStore = create<AuthDetails>((set) =>({
     isLoading: false,
     auth: null,
+    isQuestLoading: false,
     status: false,
+    userQuest: [],
 
     signup: async(data) =>{
         set({ isLoading: true });
@@ -63,7 +69,6 @@ export const UseAuthStore = create<AuthDetails>((set) =>({
         set({ isLoading: true });
         try {
             const res = await axios.get(`/api/user/profile`,{ withCredentials: true });
-            console.log(res.data);
             set({ auth: res.data?.res, isLoading: false });
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
@@ -73,7 +78,33 @@ export const UseAuthStore = create<AuthDetails>((set) =>({
             set({ isLoading: false });
         }
     },
-    getProfile: async(id) =>{
 
+    getUserQuest: async() =>{
+        set({ isQuestLoading: true });
+        try {
+            const res = await axios.get(`/api/user/profile/quest`,{ withCredentials: true });
+            set({ userQuest: res.data?.res, isQuestLoading: false });
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
+            console.log(error);
+            toast.error(error.response?.data.message || "Something went wrong");
+        }finally{
+            set({ isQuestLoading: false });
+        }
     },
+
+    getProfile: async(userId) =>{
+        set({ isLoading: true });
+        try {
+            const res = await axios.get(`/api/user/profile`,{ withCredentials: true });
+            console.log(res.data);
+            set({ auth: res.data?.res, isLoading: false });
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
+            console.log(error);
+            toast.error(error.response?.data.message || "Something went wrong");
+        }finally{
+            set({ isLoading: false });
+        }
+    }
 }))

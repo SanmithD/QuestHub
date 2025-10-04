@@ -1,19 +1,17 @@
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
 import { connectDB } from "../../lib/dbConnection";
 import { authorization } from "../../middlewares/auth.middleware";
 import { userModel } from "../../model/user.model";
 
-export const GET = async() =>{
+export const GET = async(req: NextRequest) =>{
     try {
         await connectDB();
-        const session = await getServerSession(authOptions);
+        const userId = await authorization(req);
 
-        if(!session || !session.user?.email){
+        if(!userId){
             return NextResponse.json({ message: "Invalid credential" },{ status: 400 });
         }
-        const res = await userModel.findOne({ email: session.user?.email }).select("-password");
+        const res = await userModel.findById(userId).select("-password");
         if(!res) return NextResponse.json({ message: "Account not found" },{ status: 404 });
 
         return NextResponse.json({ message: "Profile", res },{ status: 200 });
