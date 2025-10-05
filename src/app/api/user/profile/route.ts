@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "../../lib/dbConnection";
 import { authorization } from "../../middlewares/auth.middleware";
+import { questModel } from "../../model/quest.model";
 import { userModel } from "../../model/user.model";
 
 export const GET = async(req: NextRequest) =>{
@@ -27,7 +28,8 @@ export const DELETE = async(req: NextRequest) =>{
     try {
         await connectDB();
         const res = await userModel.findByIdAndDelete(userId);
-        if(!res) return NextResponse.json({ message: "Account not found" },{ status: 404 });
+        const deleteQuest = await questModel.findOneAndDelete({ userId: userId })
+        if(!res || !deleteQuest) return NextResponse.json({ message: "Account not found" },{ status: 404 });
 
         return NextResponse.json({ message: "Profile Deleted", res },{ status: 403 });
     } catch (error) {
@@ -38,11 +40,12 @@ export const DELETE = async(req: NextRequest) =>{
 
 export const PUT = async(req: NextRequest) =>{
     const body = await req.json();
+    console.log(body)
     const userId  = await authorization(req);
     if(!userId) return NextResponse.json({ message: "Unauthorized" },{ status: 403 });
     try {
         await connectDB();
-        const res = await userModel.findByIdAndUpdate(userId,body,{ new: true });
+        const res = await userModel.findByIdAndUpdate(userId,{ username: body.data } ,{ new: true });
         if(!res) return NextResponse.json({ message: "Account not found" },{ status: 404 });
 
         return NextResponse.json({ message: "Profile", res },{ status: 403 });

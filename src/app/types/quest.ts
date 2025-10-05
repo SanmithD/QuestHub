@@ -1,3 +1,4 @@
+import { QuestDetails } from "../store/UseQuestStore";
 
 export type QuestUser = {
   _id: string;
@@ -56,4 +57,12 @@ export interface UserQuestType{
   updatedAt?: Date;
   userId: string; 
   _id: string;
+}
+
+export interface HistoryType{
+  _id?: string;
+  questId: QuestDetails;
+  userId: QuestUser;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

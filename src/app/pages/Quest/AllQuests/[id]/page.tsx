@@ -21,7 +21,7 @@ function QuestInfo({ params }: QuestInfoProps) {
     if (id) {
       getQuestById(id);
     }
-  }, []);
+  }, [getQuestById, id]);
 
   if (isLoading) {
     return (

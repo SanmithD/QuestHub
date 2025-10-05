@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { UseQuestStore } from "../store/UseQuestStore";
 import { UseThemeStore } from "../store/UseThemeStore";
 
 function Navbar() {
@@ -14,13 +15,14 @@ function Navbar() {
 
   const theme = UseThemeStore((state) => state.theme);
   const setTheme = UseThemeStore((state) => state.setTheme);
+  const fetchQuest = UseQuestStore((state) => state.getAllQuests);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const navItems = [
-    { name: "Search", icon: <SearchIcon />, href: "/search" },
+    { name: "Search", icon: <SearchIcon />, href: "/pages/Search" },
     { name: "Top Rank", icon: <Trophy />, href: "/top-rank" },
     { name: "Bookmark", icon: <Bookmark />, href: "/pages/Quest/Book" },
     { name: "Profile", icon: <User2 />, href: "/pages/User" },
@@ -28,9 +30,14 @@ function Navbar() {
 
   if (!mounted) return null;
 
+  const handleHome = async() =>{
+    router.push('/');
+    await fetchQuest(1, 20);
+  }
+
   return (
     <div className="mx-auto flex justify-between items-center px-4 md:px-12 py-3 border-b ">
-      <div className="text-xl font-bold cursor-pointer px-3 py-1 border rounded-md " onClick={()=>router.push('/')} >Logo</div>
+      <div className="text-xl font-bold cursor-pointer px-3 py-1 border rounded-md " onClick={handleHome} >Logo</div>
 
       <div className="hidden md:flex justify-center gap-8 items-center py-3 font-medium">
         {navItems.map((item) => (

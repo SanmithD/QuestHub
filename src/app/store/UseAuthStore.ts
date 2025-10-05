@@ -21,13 +21,13 @@ interface AuthDetails{
     signup: (data: UserDetails) => Promise<void>;
     login: (data: UserDetails) => Promise<void>;
     deleteAccount: () => Promise<void>;
-    updateAccount: () => Promise<void>;
+    updateAccount: (data: string) => Promise<void>;
     profile: () => Promise<void>;
     getProfile: (userId: string) => Promise<void>;
     getUserQuest: () =>Promise<void>;
 }
 
-export const UseAuthStore = create<AuthDetails>((set) =>({
+export const UseAuthStore = create<AuthDetails>((set, get) =>({
     isLoading: false,
     auth: null,
     isQuestLoading: false,
@@ -59,11 +59,34 @@ export const UseAuthStore = create<AuthDetails>((set) =>({
             toast.error(error.response?.data?.message || "Something went wrong")
         }
     },
+
     deleteAccount: async() =>{
-
+        set({ isLoading: true });
+        try {
+            await axios.delete(`/api/user/profile`,{ withCredentials: true });
+            set({ auth: null, isLoading: false });
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
+            console.log(error);
+            toast.error(error.response?.data.message || "Something went wrong");
+        }finally{
+            set({ isLoading: false });
+        }
     },
-    updateAccount: async() =>{
 
+    updateAccount: async(data) =>{
+        set({ isLoading: true });
+        try {
+            await axios.put(`/api/user/profile`,{data}, { withCredentials: true });
+            set({ isLoading: false });
+            await get().profile();
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
+            console.log(error);
+            toast.error(error.response?.data.message || "Something went wrong");
+        }finally{
+            set({ isLoading: false });
+        }
     },
     profile: async() =>{
         set({ isLoading: true });

@@ -83,7 +83,6 @@ export const UseQuestStore = create<Quest>((set, get) => ({
       const res = await axios.get(`/api/quest?page=${page}&limit=${limit}`, {
         withCredentials: true,
       });
-      console.log(res.data?.res);
       set({ isLoading: false, quests: res.data?.res });
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -143,7 +142,7 @@ export const UseQuestStore = create<Quest>((set, get) => ({
   postComment: async (questId, comment) => {
     set({ isLoading: true });
     try {
-      const res = await axios.patch(
+      await axios.patch(
         `/api/quest/${questId}/comment`,
         { comment },
         { withCredentials: true }

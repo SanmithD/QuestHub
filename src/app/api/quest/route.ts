@@ -34,7 +34,7 @@ export const GET = async(req: NextRequest) =>{
 
         const url = new URL(req.url);
         const page = parseInt(url.searchParams.get("page") || "1");
-        const limit = parseInt(url.searchParams.get("limit") || "10");
+        const limit = parseInt(url.searchParams.get("limit") || "20");
         const skip = (page -1) * 10;
 
         const res = await questModel.find().sort({ createdAt: -1 }).skip(skip).limit(limit).populate("userId");

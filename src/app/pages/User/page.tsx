@@ -3,17 +3,23 @@
 import UserQuests from "@/app/Components/UserQuests";
 import { UseAuthStore } from "@/app/store/UseAuthStore";
 import { Calendar, Edit3, Mail, Trash2, User2 } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 import NewQuest from "../Quest/NewQuest/page";
 
 function Profile() {
+  const router = useRouter();
   const isLoading = UseAuthStore((state) => state.isLoading);
   const auth = UseAuthStore((state) => state.auth);
   const profile = UseAuthStore((state) => state.profile);
+  const deleteAccount = UseAuthStore((state) => state.deleteAccount);
+  const updateAccount = UseAuthStore((state) => state.updateAccount);
 
   useEffect(() => {
     profile();
-  }, []);
+  }, [profile]);
 
   if (isLoading) {
     return <div className="text-center py-10 text-gray-500">Loading...</div>;
@@ -22,6 +28,73 @@ function Profile() {
   if (!auth) {
     return <div className="text-center py-10 text-red-500">No profile found</div>;
   }
+
+  // Update profile info (username/email, etc.)
+  const handleUpdate = async() => {
+    let updatedName: string = auth.username || "";
+
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-2">
+          <input
+            type="text"
+            defaultValue={auth.username}
+            className="input text-white input-bordered w-full"
+            onChange={(e) => (updatedName = e.target.value)}
+          />
+          <div className="flex gap-2 justify-end">
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={async (e) => {
+                e.stopPropagation();
+                toast.dismiss(t.id);
+                await updateAccount(updatedName);
+                toast.success("Profile updated successfully");
+              }}
+            >
+              Update
+            </button>
+            <button
+              className="btn btn-sm btn-secondary"
+              onClick={() => toast.dismiss(t.id)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: Infinity }
+    );
+  };
+
+  const handleDelete = async() => {
+    toast(
+      (t) => (
+        <div className="flex items-center gap-3">
+          <span>Are you sure you want to delete your account?</span>
+          <button
+            className="btn btn-sm btn-error"
+            onClick={async (e) => {
+              e.stopPropagation();
+              toast.dismiss(t.id);
+              await deleteAccount();
+              await signOut();
+              router.push(`/pages/Signup`);
+            }}
+          >
+            Yes
+          </button>
+          <button
+            className="btn btn-sm btn-secondary"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            Cancel
+          </button>
+        </div>
+      ),
+      { duration: Infinity }
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -47,23 +120,35 @@ function Profile() {
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-green-500" />
             <span>
-              Joined: {auth?.createdAt ? new Date(auth?.createdAt).toLocaleDateString() : "N/A"}
+              Joined:{" "}
+              {auth?.createdAt
+                ? new Date(auth?.createdAt).toLocaleDateString()
+                : "N/A"}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-purple-500" />
             <span>
-              Updated: {auth?.createdAt ? new Date(auth?.createdAt).toLocaleDateString() : "N/A"}
+              Updated:{" "}
+              {auth?.updatedAt
+                ? new Date(auth?.updatedAt).toLocaleDateString()
+                : "N/A"}
             </span>
           </div>
         </div>
 
         <div className="flex justify-end gap-4 mt-6">
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:bg-blue-700">
+          <button
+            onClick={handleUpdate}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:bg-blue-700"
+          >
             <Edit3 size={18} />
             Update
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 active:bg-red-700">
+          <button
+            onClick={handleDelete}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 active:bg-red-700"
+          >
             <Trash2 size={18} />
             Delete
           </button>
@@ -74,7 +159,7 @@ function Profile() {
         <NewQuest />
       </div>
       <div>
-        <UserQuests/>
+        <UserQuests />
       </div>
     </div>
   );

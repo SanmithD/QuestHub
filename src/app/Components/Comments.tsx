@@ -37,7 +37,7 @@ function Comments({ id }: CommentsProps) {
           className="p-3 rounded-lg text-sm "
         >
           <p className="font-medium flex items-center text-[18px] gap-1">
-            <User2 size={20} /> {c.userId.username}
+            <User2 size={20} /> {c.userId?.username ? c.userId?.username : 'Unknown'}
           </p>
           <p>{c.message}</p>
           {c.createdAt && (

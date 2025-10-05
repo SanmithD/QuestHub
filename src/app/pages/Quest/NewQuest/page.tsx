@@ -20,15 +20,16 @@ function NewQuest() {
           Share you&apos;r Quest
         </h1>
         <div className="flex gap-3" >
-          <input
-            type="text"
+          <textarea
             value={message}
             name="message"
             placeholder="Type quest..."
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            rows={3}
+            
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
               setMessage(e.target.value)
             }
-            className="outline-0 w-full px-2 pl-1 py-1.5 border-2 rounded-sm "
+            className="outline-0 w-full px-4 pl-3 py-3 border-2 rounded-sm "
           />
           <button disabled={isLoading} onClick={handleShare} className="flex text-[20px] font-medium cursor-pointer justify-center items-center px-4 py-1.5 rounded-md bg-sky-400 hover:bg-sky-700 active:bg-sky-500" >
             { isLoading ? "Sending...": "Share" } <Send size={20}/>

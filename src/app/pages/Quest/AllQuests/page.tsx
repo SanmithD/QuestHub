@@ -12,6 +12,7 @@ const QuestController = lazy(()=>import('@/app/Components/QuestController'))
 function AllQuest() {
   const router = useRouter();
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const isLoading = UseQuestStore((state) => state.isLoading);
   const getAllQuests = UseQuestStore((state) => state.getAllQuests);
   const quests = UseQuestStore((state) => state.quests);
@@ -19,8 +20,13 @@ function AllQuest() {
   const booked = UseBookmarkStore((state) => state.booked);
 
   useEffect(() => {
-    getAllQuests(page, 10);
-  }, [page, getAllQuests]);
+    getAllQuests(page, limit);
+  }, [page,limit, getAllQuests]);
+
+  const loadMore = () =>{
+    setLimit(limit + 10);
+    setPage(page + 1);
+  }
 
   if (isLoading) {
     return <p className="text-center mt-4">Loading quests...</p>;
@@ -64,6 +70,7 @@ function AllQuest() {
       ) : (
         <p className="text-center text-gray-500">No quests found</p>
       )}
+      <button className="btn w-full text-center" onClick={loadMore} >Load more</button>
     </div>
   );
 }
