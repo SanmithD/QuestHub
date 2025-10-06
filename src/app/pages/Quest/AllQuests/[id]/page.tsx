@@ -3,6 +3,7 @@
 import Comments from "@/app/Components/Comments";
 import { UseQuestStore } from "@/app/store/UseQuestStore";
 import { Calendar, Heart, MessageSquare, Trophy, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 type QuestInfoProps = {
@@ -11,6 +12,7 @@ type QuestInfoProps = {
 
 function QuestInfo({ params }: QuestInfoProps) {
   const { id } = React.use(params);
+  const router = useRouter();
   const [userComment, setUserComment] = useState("");
   const getQuestById = UseQuestStore((state) => state.getQuestById);
   const postComment = UseQuestStore((state) => state.postComment);
@@ -44,12 +46,12 @@ function QuestInfo({ params }: QuestInfoProps) {
   return (
     <div className="max-w-3xl mx-auto p-6 rounded-2xl shadow-lg space-y-6">
       {quest?.userId && (
-        <div className="flex items-center gap-3 border-b pb-4">
+        <div onClick={()=>router.push(`/pages/User/${quest.userId?._id}`)} className="flex items-center gap-3 border-b pb-4">
           <div className="p-2 bg-gray-100 rounded-full">
             <User className="w-6 h-6 text-gray-600" />
           </div>
           <div>
-            <p className="font-semibold text-lg">{quest.userId.username}</p>
+            <p className="font-semibold text-lg cursor-pointer ">{quest.userId.username}</p>
             <p className="text-sm text-gray-500">{quest.userId.email}</p>
           </div>
         </div>

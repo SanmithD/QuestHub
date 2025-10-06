@@ -1,4 +1,4 @@
-import { QuestDetails } from "../store/UseQuestStore";
+import { QuestDetails, UserDetails } from "../store/UseQuestStore";
 
 export type QuestUser = {
   _id: string;
@@ -63,6 +63,22 @@ export interface HistoryType{
   _id?: string;
   questId: QuestDetails;
   userId: QuestUser;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface TopRankType{
+  _id?: string;
+  questId: QuestDetails;
+  userId: QuestUser;
+  rankValue?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ProfileById{
+  res: UserDetails;
+  userQuest: QuestDetails;
   createdAt?: Date;
   updatedAt?: Date;
 }

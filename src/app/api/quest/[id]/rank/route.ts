@@ -1,6 +1,7 @@
 import { connectDB } from "@/app/api/lib/dbConnection";
 import { authorization } from "@/app/api/middlewares/auth.middleware";
 import { questModel } from "@/app/api/model/quest.model";
+import { rankModel } from "@/app/api/model/rank.model";
 import { NextRequest, NextResponse } from "next/server";
 
 export const PATCH = async (
@@ -24,6 +25,14 @@ export const PATCH = async (
 
     quest.rankValue = body.rankValue;
     await quest.save();
+    let rank = await rankModel.findOne({ questId, userId });
+    if(rank){
+      rank.rankValue = body.rankValue;
+      await rank.save();
+    }else{
+      rank = new rankModel({ questId, userId, rankValue: body.rankValue });
+      await rank.save();
+    }
 
     return NextResponse.json({ message: "Quest ranked", quest }, { status: 200 });
   } catch (error) {
@@ -32,15 +41,3 @@ export const PATCH = async (
   }
 };
 
-export const GET = async() =>{
-  try {
-    const res = await questModel.find({ rankValue: -1 }).populate("userId").sort({ createdAt: -1 });
-
-    if(!res || res.length === 0) return NextResponse.json({ message: "No top ranked quest" },{ status: 404 });
-
-    return NextResponse.json({ message: "Top quests", res },{ status: 200 });
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json({ message: "Server Error" }, { status: 500 });
-  }
-}

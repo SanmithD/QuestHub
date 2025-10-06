@@ -1,10 +1,10 @@
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
-import { UserQuestType } from "../types/quest";
+import { ProfileById, UserQuestType } from "../types/quest";
 
 type UserDetails ={
-    userId?: string;
+    _id?: string;
     username?: string;
     email: string;
     password?: string;
@@ -16,6 +16,7 @@ interface AuthDetails{
     isLoading: boolean;
     isQuestLoading: boolean;
     auth: UserDetails | null;
+    userData: ProfileById | null;
     status: boolean;
     userQuest: UserQuestType[];
     signup: (data: UserDetails) => Promise<void>;
@@ -23,7 +24,7 @@ interface AuthDetails{
     deleteAccount: () => Promise<void>;
     updateAccount: (data: string) => Promise<void>;
     profile: () => Promise<void>;
-    getProfile: (userId: string) => Promise<void>;
+    getProfile: (userId: string, limit: number) => Promise<void>;
     getUserQuest: () =>Promise<void>;
 }
 
@@ -33,6 +34,7 @@ export const UseAuthStore = create<AuthDetails>((set, get) =>({
     isQuestLoading: false,
     status: false,
     userQuest: [],
+    userData: null,
 
     signup: async(data) =>{
         set({ isLoading: true });
@@ -116,12 +118,12 @@ export const UseAuthStore = create<AuthDetails>((set, get) =>({
         }
     },
 
-    getProfile: async(userId) =>{
+    getProfile: async(id, limit) =>{
         set({ isLoading: true });
         try {
-            const res = await axios.get(`/api/user/profile`,{ withCredentials: true });
+            const res = await axios.get(`/api/user/profile/${id}?limit=${limit}`,{ withCredentials: true });
             console.log(res.data);
-            set({ auth: res.data?.res, isLoading: false });
+            set({ userData: res.data?.userData, isLoading: false });
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
             console.log(error);

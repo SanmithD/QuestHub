@@ -54,7 +54,7 @@ function AllQuest() {
 
             <div className="flex items-center gap-2" >
               <Suspense fallback={"Loading..."} >
-            <QuestController quest={quest as Quest} />
+            <QuestController quest={quest as unknown as Quest} />
             </Suspense>
             <button
                 onClick={() => bookmark(quest._id)}

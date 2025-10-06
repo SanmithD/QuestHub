@@ -1,17 +1,22 @@
 import axios, { AxiosError } from "axios";
+import { JSX } from "react";
 import toast from "react-hot-toast";
 import { create } from "zustand";
-import { QuestComment } from "../types/quest";
+import { QuestComment, TopRankType } from "../types/quest";
 import { UseAuthStore } from "./UseAuthStore";
 
 export type UserDetails = {
   email: string;
   username?: string;
-  userId: string;
+  _id: string;
   message: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type QuestDetails = {
+  map(arg0: (quest: QuestDetails) => JSX.Element): import("react").ReactNode;
+  length: number;
   _id: string;
   questId?: string;
   message: string;
@@ -29,6 +34,7 @@ interface Quest {
   currentQuest?: QuestDetails | null;
   quests: QuestDetails[] | null;
   comments?: QuestComment[] | null;
+  topQuest: TopRankType[] | null;
 
   postQuest: (data: string) => Promise<void>;
   getAllQuests: (page: number, limit: number) => Promise<void>;
@@ -39,6 +45,7 @@ interface Quest {
   postLike: (questId: string) => Promise<void>;
   fetchComments: (questId: string, limit: number) => Promise<void>;
   postRank: (questId: string, rankValue: number) => Promise<void>;
+  fetchTopQuest: (limit: number) =>Promise<void>;
 
   updateQuestOptimistically: (
     questId: string,
@@ -51,6 +58,7 @@ export const UseQuestStore = create<Quest>((set, get) => ({
   quests: null,
   comments: null,
   isCommentLoading: false,
+  topQuest: null,
 
   updateQuestOptimistically: (questId, updates) => {
     const currentQuests = get().quests;
@@ -246,4 +254,20 @@ export const UseQuestStore = create<Quest>((set, get) => ({
       toast.error(error.response?.data?.message || "Something went wrong");
     }
   },
+
+  fetchTopQuest: async(limit) =>{
+    set({ isLoading: true });
+    try {
+      const res = await axios.get(
+        `/api/quest/topRank?limit=${limit}`,
+        { withCredentials: true }
+      );
+      set({ isLoading: false, topQuest: res.data?.res });
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      console.log(error);
+      set({ isLoading: false });
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  }
 }));
