@@ -1,8 +1,9 @@
 "use client";
 
 import Comments from "@/app/Components/Comments";
+import { UseBookmarkStore } from "@/app/store/UseBookmarkStore";
 import { UseQuestStore } from "@/app/store/UseQuestStore";
-import { Calendar, Heart, MessageSquare, Trophy, User } from "lucide-react";
+import { Bookmark, Calendar, Heart, MessageSquare, Trophy, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -18,6 +19,7 @@ function QuestInfo({ params }: QuestInfoProps) {
   const postComment = UseQuestStore((state) => state.postComment);
   const isLoading = UseQuestStore((state) => state.isLoading);
   const quest = UseQuestStore((state) => state.currentQuest);
+  const bookmark = UseBookmarkStore((state) => state.bookmark);
 
   useEffect(() => {
     if (id) {
@@ -81,6 +83,10 @@ function QuestInfo({ params }: QuestInfoProps) {
         <div className="flex items-center gap-1">
           <Trophy className="w-4 h-4 text-yellow-500" />
           <span>Rank {quest.rankValue}</span>
+        </div>
+        <div onClick={()=>bookmark(quest._id)} className="flex cursor-pointer items-center gap-1">
+          <Bookmark className="w-4 h-4 text-green-500"/>
+          <span>Bookmark</span>
         </div>
       </div>
 

@@ -102,6 +102,7 @@ function TopRanks() {
                 <td className="text-center">
                   <div
                     onClick={(e) => {
+                      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                       e.stopPropagation(), postLike(rank?.questId?._id);
                     }}
                     className="flex justify-center items-center gap-1 text-gray-600 hover:text-sky-500"

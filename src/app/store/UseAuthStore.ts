@@ -17,10 +17,9 @@ interface AuthDetails{
     isQuestLoading: boolean;
     auth: UserDetails | null;
     userData: ProfileById | null;
-    status: boolean;
     userQuest: UserQuestType[];
-    signup: (data: UserDetails) => Promise<void>;
-    login: (data: UserDetails) => Promise<void>;
+    signup: (data: UserDetails) => Promise<boolean>;
+    login: (data: UserDetails) => Promise<boolean>;
     deleteAccount: () => Promise<void>;
     updateAccount: (data: string) => Promise<void>;
     profile: () => Promise<void>;
@@ -32,7 +31,6 @@ export const UseAuthStore = create<AuthDetails>((set, get) =>({
     isLoading: false,
     auth: null,
     isQuestLoading: false,
-    status: false,
     userQuest: [],
     userData: null,
 
@@ -40,12 +38,14 @@ export const UseAuthStore = create<AuthDetails>((set, get) =>({
         set({ isLoading: true });
         try {
             await axios.post(`/api/user/signup`,data);
-            set({ isLoading: false, status: true });
+            set({ isLoading: false });
+            return true
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
             console.log(error);
-            set({ isLoading: false, status: false })
-            toast.error(error.response?.data?.message || "Something went wrong")
+            set({ isLoading: false })
+            toast.error(error.response?.data?.message || "Something went wrong");
+            return false
         }
     },
 
@@ -53,12 +53,14 @@ export const UseAuthStore = create<AuthDetails>((set, get) =>({
         set({ isLoading: true });
         try {
             await axios.post(`/api/user/login`,data);
-            set({ isLoading: false, status: true });
+            set({ isLoading: false });
+            return true
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
             console.log(error);
-            set({ isLoading: false, status: false })
-            toast.error(error.response?.data?.message || "Something went wrong")
+            set({ isLoading: false })
+            toast.error(error.response?.data?.message || "Something went wrong");
+            return false
         }
     },
 
@@ -122,7 +124,6 @@ export const UseAuthStore = create<AuthDetails>((set, get) =>({
         set({ isLoading: true });
         try {
             const res = await axios.get(`/api/user/profile/${id}?limit=${limit}`,{ withCredentials: true });
-            console.log(res.data);
             set({ userData: res.data?.userData, isLoading: false });
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;

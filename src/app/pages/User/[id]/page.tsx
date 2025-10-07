@@ -3,6 +3,7 @@
 import { UseAuthStore } from "@/app/store/UseAuthStore";
 import { QuestDetails } from "@/app/store/UseQuestStore";
 import { MessageCircle, Star, ThumbsUp } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 type UserProfileId = {
@@ -10,6 +11,8 @@ type UserProfileId = {
 };
 
 function ProfileById({ params }: UserProfileId) {
+
+  const router = useRouter();
   const { id }= React.use(params);
 
   const [limit, setLimit] = useState(10);
@@ -39,7 +42,6 @@ function ProfileById({ params }: UserProfileId) {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      {/* User Info */}
       <div className="bg-base-200 rounded-xl shadow p-6 mb-8">
         <h2 className="text-3xl font-bold">{user.res.username}</h2>
         <p className="text-gray-600">{user.res.email}</p>
@@ -50,7 +52,6 @@ function ProfileById({ params }: UserProfileId) {
         </p>
       </div>
 
-      {/* User Quests */}
       <div>
         <h3 className="text-2xl font-semibold mb-4">Quests</h3>
         <div className="space-y-4">
@@ -58,7 +59,8 @@ function ProfileById({ params }: UserProfileId) {
             user.userQuest?.map((quest: QuestDetails) => (
               <div
                 key={quest._id}
-                className="bg-base-100 border rounded-xl p-4 shadow hover:shadow-md transition"
+                onClick={()=>router.push(`/pages/Quest/AllQuests/${quest._id}`)}
+                className="bg-base-100 border cursor-pointer rounded-xl p-4 shadow hover:shadow-md transition"
               >
                 <p className="text-lg font-medium">{quest.message}</p>
                 <p className="text-xs text-gray-500">

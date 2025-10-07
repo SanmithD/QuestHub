@@ -29,7 +29,6 @@ function Profile() {
     return <div className="text-center py-10 text-red-500">No profile found</div>;
   }
 
-  // Update profile info (username/email, etc.)
   const handleUpdate = async() => {
     let updatedName: string = auth.username || "";
 
@@ -100,7 +99,6 @@ function Profile() {
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6">Profile</h1>
 
-      {/* Profile Card */}
       <div className="shadow-md rounded-2xl p-6 max-w-lg mx-auto">
         <div className="flex items-center gap-4 mb-6">
           <div className="bg-sky-100 p-4 rounded-full">

@@ -29,7 +29,6 @@ function UserQuests() {
     return <div className="p-4 text-gray-400">No quests found.</div>;
   }
 
-  // Update using toast with input
   const handleUpdate = (id: string, prevMessage: string) => {
     let newMessage = prevMessage;
 
@@ -68,7 +67,6 @@ function UserQuests() {
     );
   };
 
-  // Delete with toast confirmation
   const handleDelete = (id: string) => {
     toast(
       (t) => (

@@ -13,7 +13,7 @@ export const POST = async(req: NextRequest) =>{
             return NextResponse.json({ message: "User does not exists" },{ status: 400 });
         }
 
-        const hashPass = await bcrypt.compare(user.password, data.password);
+        const hashPass = await bcrypt.compare(data.password, user.password);
         if(!hashPass){
             return NextResponse.json({ message: "Invalid credentials" },{ status: 403 });
         }

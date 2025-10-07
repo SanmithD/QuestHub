@@ -11,6 +11,7 @@ function NewQuest() {
 
   const handleShare = async()=>{
     await postQuest(message);
+    setMessage("")
   }
 
   return (

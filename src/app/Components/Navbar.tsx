@@ -1,7 +1,17 @@
 "use client";
 
-import { Bookmark, Menu, Moon, SearchIcon, Sun, Trophy, User2, X } from "lucide-react";
+import {
+  Bookmark,
+  Menu,
+  Moon,
+  SearchIcon,
+  Sun,
+  Trophy,
+  User2,
+  X,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,7 +21,7 @@ import { UseThemeStore } from "../store/UseThemeStore";
 function Navbar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false); 
+  const [mounted, setMounted] = useState(false);
 
   const theme = UseThemeStore((state) => state.theme);
   const setTheme = UseThemeStore((state) => state.setTheme);
@@ -30,14 +40,37 @@ function Navbar() {
 
   if (!mounted) return null;
 
-  const handleHome = async() =>{
-    router.push('/');
+  const handleHome = async () => {
+    router.push("/");
     await fetchQuest(1, 20);
-  }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      localStorage.removeItem("jwt");
+      await signOut({ redirect: false });
+
+      router.push("/pages/Login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <div className="mx-auto flex justify-between items-center px-4 md:px-12 py-3 border-b ">
-      <div className="text-xl font-bold cursor-pointer px-3 py-1 border rounded-md " onClick={handleHome} >Logo</div>
+      <div
+        className="text-xl flex items-center font-bold cursor-pointer rounded-full "
+        onClick={handleHome}
+      >
+        <Image
+          src="/QuestLogo1.png"
+          alt={"logo"}
+          height={50}
+          width={50}
+          className="md:w-[70px] md:h-[70px] "
+        />
+        <span className="text-2xl font-bold tracking-wide" >Quest Hub</span>
+      </div>
 
       <div className="hidden md:flex justify-center gap-8 items-center py-3 font-medium">
         {navItems.map((item) => (
@@ -59,7 +92,10 @@ function Navbar() {
         </button>
 
         <button
-          onClick={() => signOut()}
+          onClick={() => {
+            handleSignOut();
+            setIsOpen(false);
+          }}
           className="px-4 rounded-md bg-red-400 py-2 text-white cursor-pointer hover:bg-red-500 active:bg-red-700"
         >
           Sign out
@@ -73,7 +109,7 @@ function Navbar() {
       </div>
 
       {isOpen && (
-        <div className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center py-4 gap-4 md:hidden font-medium z-50">
+        <div className="absolute top-16 left-0 w-full bg-gray-500 shadow-md flex flex-col items-center py-4 gap-4 md:hidden font-medium z-50">
           {navItems.map((item) => (
             <Link
               key={item.name}
@@ -87,10 +123,7 @@ function Navbar() {
           ))}
 
           <button
-            onClick={() => {
-              setIsOpen(false);
-              signOut();
-            }}
+            onClick={handleSignOut}
             className="px-4 rounded-md bg-red-400 py-2 text-white cursor-pointer hover:bg-red-500 active:bg-red-700"
           >
             Sign out

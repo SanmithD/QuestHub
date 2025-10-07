@@ -17,7 +17,6 @@ function AllQuest() {
   const getAllQuests = UseQuestStore((state) => state.getAllQuests);
   const quests = UseQuestStore((state) => state.quests);
   const bookmark = UseBookmarkStore((state) => state.bookmark);
-  const booked = UseBookmarkStore((state) => state.booked);
 
   useEffect(() => {
     getAllQuests(page, limit);

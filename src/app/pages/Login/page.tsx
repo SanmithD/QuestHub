@@ -14,7 +14,6 @@ function LoginPage() {
 
   const login = UseAuthStore((state) => state.login);
   const isLoading = UseAuthStore((state) => state.isLoading);
-  const status = UseAuthStore((state) => state.status);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -25,15 +24,15 @@ function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(formData);
-    if(status){
-      router.push('/')
+    const success = await login(formData);
+    if(success){
+      router.push('/');
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <div className="flex items-center justify-center min-h-screen px-4">
+      <div className="w-full max-w-md rounded-2xl shadow-lg p-8">
         <h2 className="text-2xl font-bold text-center mb-6">Welcome Back!</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>

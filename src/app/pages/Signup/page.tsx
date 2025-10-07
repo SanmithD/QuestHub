@@ -15,7 +15,6 @@ function SignupPage() {
 
   const signup = UseAuthStore((state) => state.signup);
   const isLoading = UseAuthStore((state) => state.isLoading);
-  const status = UseAuthStore((state) => state.status);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -26,15 +25,15 @@ function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signup(formData);
-    if(status === true){
+    const success = await signup(formData);
+    if(success){
       router.push('/')
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <div className="flex items-center justify-center min-h-screen px-4">
+      <div className="w-full max-w-md rounded-2xl shadow-lg p-8">
         <h2 className="text-2xl font-bold text-center mb-6">Create an Account</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>

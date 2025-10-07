@@ -26,7 +26,6 @@ export const UseSearchStore = create<SearchDetails>((set, get) => ({
       const res = await axios.get(`/api/search/history?limit=${limit}`, {
         withCredentials: true,
       });
-      console.log(res.data)
       set({ history: res.data?.res || [], isSearchLoading: false });
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -55,7 +54,6 @@ export const UseSearchStore = create<SearchDetails>((set, get) => ({
         { withCredentials: true }
       );
       set({ quests: res.data?.res || [], isSearchLoading: false });
-      console.log(res.data)
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       set({ isSearchLoading: false });

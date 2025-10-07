@@ -41,9 +41,9 @@ export const UseBookmarkStore = create<BookMark>((set, get) => ({
   getBookmarked: async () => {
     set({ isLoading: true });
     try {
-      const res = await axios.get(`/api/bookmarks`, { withCredentials: true });
+      const res = await axios.get(`/api/bookmarks/allBooked`, { withCredentials: true });
       set({ booked: res.data?.res || [], isLoading: false });
-    } catch (error) {
+    } catch (error) { 
       const err = error as AxiosError<{ message: string }>;
       console.log(err);
       toast.error(err.response?.data.message || "Something went wrong");

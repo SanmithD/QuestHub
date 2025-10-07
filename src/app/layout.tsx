@@ -1,7 +1,7 @@
  import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
-import Navbar from "./Components/Navbar";
+import NavbarWrapper from "./Components/NavbarWrapper";
 import SessionWrapper from "./Components/SessionWrapper";
 import ThemeProvider from "./Components/ThemeProvider";
 import './globals.css';
@@ -34,7 +34,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
         <Toaster/>
-        <Navbar/>
+        <NavbarWrapper/>
         {children}
         </ThemeProvider>
       </body>

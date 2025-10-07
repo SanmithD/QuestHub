@@ -7,7 +7,6 @@ import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// Debounce hook
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -51,7 +50,6 @@ export default function SearchQuest() {
 
   return (
     <div className="max-w-xl mx-auto mt-6 p-4 space-y-6">
-      {/* Search Input */}
       <div className="flex gap-2">
         <input
           type="text"
@@ -94,7 +92,6 @@ export default function SearchQuest() {
         </div>
       )}
 
-      {/* Search Results */}
       {query && (
         <div>
           <h3 className="font-semibold mb-2">Results</h3>

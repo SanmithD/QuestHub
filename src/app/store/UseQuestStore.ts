@@ -45,7 +45,7 @@ interface Quest {
   postLike: (questId: string) => Promise<void>;
   fetchComments: (questId: string, limit: number) => Promise<void>;
   postRank: (questId: string, rankValue: number) => Promise<void>;
-  fetchTopQuest: (limit: number) =>Promise<void>;
+  fetchTopQuest: (limit: number) => Promise<void>;
 
   updateQuestOptimistically: (
     questId: string,
@@ -118,10 +118,9 @@ export const UseQuestStore = create<Quest>((set, get) => ({
   deleteQuest: async (questId) => {
     set({ isLoading: true });
     try {
-      const res = await axios.delete(`/api/quest/${questId}`, {
+      await axios.delete(`/api/quest/${questId}`, {
         withCredentials: true,
       });
-      console.log(res.data);
       set({ isLoading: false });
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -134,9 +133,13 @@ export const UseQuestStore = create<Quest>((set, get) => ({
   updateQuest: async (questId, message) => {
     set({ isLoading: true });
     try {
-      await axios.put(`/api/quest/${questId}`, { message }, {
-        withCredentials: true,
-      });
+      await axios.put(
+        `/api/quest/${questId}`,
+        { message },
+        {
+          withCredentials: true,
+        }
+      );
       set({ isLoading: false });
       await UseAuthStore.getState().getUserQuest();
     } catch (err) {
@@ -223,19 +226,11 @@ export const UseQuestStore = create<Quest>((set, get) => ({
     }
   },
 
-  postRank: async (questId: string, rankValue: number) => {
-    const currentQuests = get().quests;
-    if (!currentQuests) return;
-
-    const currentQuest = currentQuests.find((q) => q._id === questId);
-    if (!currentQuest) return;
-
-    get().updateQuestOptimistically(questId, { rankValue });
-
+  postRank: async (questId: string) => {
     try {
       const res = await axios.patch(
         `/api/quest/${questId}/rank`,
-        { rankValue },
+        {},
         { withCredentials: true }
       );
 
@@ -245,23 +240,18 @@ export const UseQuestStore = create<Quest>((set, get) => ({
         });
       }
     } catch (err) {
-      get().updateQuestOptimistically(questId, {
-        rankValue: currentQuest.rankValue,
-      });
-
       const error = err as AxiosError<{ message: string }>;
       console.log(error);
       toast.error(error.response?.data?.message || "Something went wrong");
     }
   },
 
-  fetchTopQuest: async(limit) =>{
+  fetchTopQuest: async (limit) => {
     set({ isLoading: true });
     try {
-      const res = await axios.get(
-        `/api/quest/topRank?limit=${limit}`,
-        { withCredentials: true }
-      );
+      const res = await axios.get(`/api/quest/topRank?limit=${limit}`, {
+        withCredentials: true,
+      });
       set({ isLoading: false, topQuest: res.data?.res });
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -269,5 +259,5 @@ export const UseQuestStore = create<Quest>((set, get) => ({
       set({ isLoading: false });
       toast.error(error.response?.data?.message || "Something went wrong");
     }
-  }
+  },
 }));
