@@ -10,7 +10,7 @@ import {
   User2,
   X,
 } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -20,8 +20,12 @@ import { UseThemeStore } from "../store/UseThemeStore";
 
 function Navbar() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // state to reflect auth status (session or jwt cookie)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const theme = UseThemeStore((state) => state.theme);
   const setTheme = UseThemeStore((state) => state.setTheme);
@@ -30,6 +34,18 @@ function Navbar() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // update auth state whenever session changes
+  useEffect(() => {
+    if (!mounted) return;
+
+    // check cookie manually
+    const hasJwt =
+      typeof document !== "undefined" &&
+      document.cookie.split("; ").some((row) => row.startsWith("jwt="));
+
+    setIsAuthenticated(Boolean(session?.user?.email || hasJwt));
+  }, [mounted, session]);
 
   const navItems = [
     { name: "Search", icon: <SearchIcon />, href: "/pages/Search" },
@@ -47,9 +63,16 @@ function Navbar() {
 
   const handleSignOut = async () => {
     try {
-      localStorage.removeItem("jwt");
-      await signOut({ redirect: false });
+      // clear jwt cookie
+      document.cookie =
+        "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
+      // sign out next-auth session if present
+      if (session) {
+        await signOut({ redirect: false });
+      }
+
+      setIsAuthenticated(false);
       router.push("/pages/Login");
     } catch (error) {
       console.error("Error signing out:", error);
@@ -64,12 +87,12 @@ function Navbar() {
       >
         <Image
           src="/QuestLogo1.png"
-          alt={"logo"}
+          alt="logo"
           height={50}
           width={50}
-          className="md:w-[70px] md:h-[70px] "
+          className="md:w-[70px] md:h-[70px]"
         />
-        <span className="text-2xl font-bold tracking-wide" >Quest Hub</span>
+        <span className="text-2xl font-bold tracking-wide">Quest Hub</span>
       </div>
 
       <div className="hidden md:flex justify-center gap-8 items-center py-3 font-medium">
@@ -91,15 +114,24 @@ function Navbar() {
           {theme === "dark" ? <Sun size={24} /> : <Moon size={24} />}
         </button>
 
-        <button
-          onClick={() => {
-            handleSignOut();
-            setIsOpen(false);
-          }}
-          className="px-4 rounded-md bg-red-400 py-2 text-white cursor-pointer hover:bg-red-500 active:bg-red-700"
-        >
-          Sign out
-        </button>
+        {isAuthenticated ? (
+          <button
+            onClick={() => {
+              handleSignOut();
+              setIsOpen(false);
+            }}
+            className="px-4 rounded-md bg-red-400 py-2 text-white cursor-pointer hover:bg-red-500 active:bg-red-700"
+          >
+            Sign out
+          </button>
+        ) : (
+          <button
+            onClick={() => router.push("/pages/Signup")}
+            className="px-4 rounded-md bg-green-500 py-2 text-white cursor-pointer hover:bg-green-600 active:bg-green-700"
+          >
+            Sign In
+          </button>
+        )}
       </div>
 
       <div className="block items-center md:hidden">
@@ -122,12 +154,27 @@ function Navbar() {
             </Link>
           ))}
 
-          <button
-            onClick={handleSignOut}
-            className="px-4 rounded-md bg-red-400 py-2 text-white cursor-pointer hover:bg-red-500 active:bg-red-700"
-          >
-            Sign out
-          </button>
+          {isAuthenticated ? (
+            <button
+              onClick={() => {
+                handleSignOut();
+                setIsOpen(false);
+              }}
+              className="px-4 rounded-md bg-red-400 py-2 text-white cursor-pointer hover:bg-red-500 active:bg-red-700"
+            >
+              Sign out
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                router.push("/pages/Signup");
+                setIsOpen(false);
+              }}
+              className="px-4 rounded-md bg-green-500 py-2 text-white cursor-pointer hover:bg-green-600 active:bg-green-700"
+            >
+              Sign In
+            </button>
+          )}
         </div>
       )}
     </div>
